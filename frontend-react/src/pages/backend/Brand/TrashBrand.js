@@ -1,0 +1,126 @@
+import { useEffect, useState } from "react";
+import BrandService from "../../../service/BrandService";
+import { urlImage } from "../../../config";
+const TrashBrand = () => {
+   
+    const [brands, setBrands] = useState([]);
+    const [load, setLoad] = useState(Date.now());
+    useEffect(() => {
+        (async () => {
+            const result = await BrandService.getList1();
+            setBrands(result.data.brands);
+        })();
+    }, [load]);
+    const handDestroy = (id) => {
+        (async () =>{
+            const result = await BrandService.destroy(id);
+             if(result.data.status === true)
+             {
+                 setLoad(Date.now());
+             }
+             })();  
+      };
+
+    const handRestore = (id) => {
+        (async () => {
+           
+                const result = await BrandService.restore(id);
+                if (result.data.status === true) {
+                   
+                    setLoad(Date.now());
+                }
+        })();
+    };
+    
+    return (
+        <div>
+            <section className="content-header my-2">
+                <h1 className="d-inline">Thùng rác thương hiệu</h1>
+                <div className="row mt-3 align-items-center">
+                    <div className="col-6">
+                        <ul className="manager">
+                            <li><a href="brand_index.html">Tất cả (123)</a></li>
+                            <li><a href="#">Xuất bản (12)</a></li>
+                            <li><a href="brand_trash.html">Rác (12)</a></li>
+                        </ul>
+                    </div>
+                    <div className="col-6 text-end">
+                        <input type="text" className="search d-inline" />
+                        <button className="d-inline btnsearch">Tìm kiếm</button>
+                    </div>
+                </div>
+                <div className="row mt-1 align-items-center">
+                    <div className="col-md-8">
+                        <select name className="d-inline me-1">
+                            <option value>Hành động</option>
+                            <option value>Bỏ vào thùng rác</option>
+                        </select>
+                        <button className="btnapply">Áp dụng</button>
+                    </div>
+                    <div className="col-md-4 text-end">
+                        <nav aria-label="Page navigation example">
+                            <ul className="pagination pagination-sm justify-content-end">
+                                <li className="page-item disabled">
+                                    <a className="page-link">«</a>
+                                </li>
+                                <li className="page-item"><a className="page-link" href="#">1</a></li>
+                                <li className="page-item"><a className="page-link" href="#">2</a></li>
+                                <li className="page-item"><a className="page-link" href="#">3</a></li>
+                                <li className="page-item">
+                                    <a className="page-link" href="#">»</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </section>
+            <section className="content-body my-2">
+                <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th className="text-center" style={{ width: 30 }}>
+                                <input type="checkbox" id="checkboxAll" />
+                            </th>
+                            <th className="text-center" style={{ width: 130 }}>Hình ảnh</th>
+                            <th>Tên thương hiệu</th>
+                            <th>Tên slug</th>
+                            <th className="text-center" style={{ width: 30 }}>ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {brands && brands.map((brand,index ) => (
+                        <tr className="datarow" key={index}>
+                            <td className="text-center">
+                                <input type="checkbox" id="checkId" />
+                            </td>
+                            <td>
+                                <img src={urlImage + "brand/" + brand.image} alt="brand.jpg" />
+                            </td>
+                            <td>
+                                <div className="name">
+                                    <a href="brand_index.html">
+                                    {brand.name}
+                                    </a>
+                                </div>
+                                <div className="function_style">
+                                    <button className="text-primary mx-1" onClick={() => handRestore(brand.id)}>
+                                        <i className="fa fa-undo" />
+                                    </button>
+                                    <button className="text-danger mx-1" onClick={() => handDestroy(brand.id)}>
+                                        <i className="fa fa-trash" />
+                                    </button>
+                                </div>
+                            </td>
+                            <td>{brand.slug}</td>
+                            <td className="text-center">{brand.id}</td>
+                        </tr>
+                         ))}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+    );
+}
+
+export default TrashBrand;
